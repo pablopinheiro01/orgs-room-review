@@ -1,9 +1,7 @@
 package br.com.alura.orgs.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
+import android.content.Context
+import androidx.room.*
 import br.com.alura.orgs.database.converter.Converters
 import br.com.alura.orgs.database.dao.ProdutoDao
 import br.com.alura.orgs.model.Produto
@@ -13,5 +11,16 @@ import br.com.alura.orgs.model.Produto
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun produtoDao(): ProdutoDao
+
+    companion object{
+        fun getInstance(context: Context)=
+            Room.databaseBuilder(
+                context,
+                AppDatabase::class.java,
+                "orgs.db"
+            )
+                .allowMainThreadQueries()
+                .build()
+    }
 
 }
