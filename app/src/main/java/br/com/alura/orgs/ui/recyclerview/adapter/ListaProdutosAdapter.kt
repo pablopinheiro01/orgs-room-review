@@ -1,10 +1,14 @@
 package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.R
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extensions.formataParaMoedaBrasileira
 import br.com.alura.orgs.extensions.tentaCarregarImagem
@@ -13,7 +17,9 @@ import br.com.alura.orgs.model.Produto
 class ListaProdutosAdapter(
     private val context: Context,
     produtos: List<Produto> = emptyList(),
-    var quandoClicaNoItem: (produto: Produto) -> Unit = {}
+    var quandoClicaNoItem: (produto: Produto) -> Unit = {},
+    var quandoClicaEmEditar: (produto: Produto) -> Unit = {},
+    var quandoClicaemRemover: (produto: Produto) -> Unit = {}
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     private val produtos = produtos.toMutableList()
@@ -22,12 +28,33 @@ class ListaProdutosAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         private lateinit var produto: Produto
+        private val popupMenu = PopupMenu(binding.root.context, itemView)
+        private val menuInflater = MenuInflater(binding.root.context)
 
         init {
+            menuInflater.inflate(R.menu.menu_detalhes_produto, popupMenu.menu)
+
+            popupMenu.setOnMenuItemClickListener{
+                when(it.itemId){
+                    R.id.menu_detalhes_produto_remover -> {
+                        quandoClicaemRemover(produto)
+                        true
+                    }
+                    R.id.menu_detalhes_produto_editar ->{
+                        quandoClicaEmEditar(produto)
+                        true
+                    }
+                    else -> false
+                }
+            }
             itemView.setOnClickListener {
                 if (::produto.isInitialized) {
                     quandoClicaNoItem(produto)
                 }
+            }
+            itemView.setOnLongClickListener{
+                popupMenu.show()
+                true
             }
         }
 
@@ -52,7 +79,6 @@ class ListaProdutosAdapter(
 
             binding.imageView.tentaCarregarImagem(produto.imagem)
         }
-
 
     }
 

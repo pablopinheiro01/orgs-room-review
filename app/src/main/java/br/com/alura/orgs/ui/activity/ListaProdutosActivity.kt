@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
@@ -19,6 +20,7 @@ class ListaProdutosActivity : AppCompatActivity() {
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
+
     }
 
     override fun onResume() {
@@ -52,6 +54,13 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+        adapter.quandoClicaEmEditar = {
+            Log.i("teste", "Editar: $it")
+        }
+        adapter.quandoClicaemRemover = {
+            Log.i("teste", "Remover: $it")
+        }
+
     }
 
 }
