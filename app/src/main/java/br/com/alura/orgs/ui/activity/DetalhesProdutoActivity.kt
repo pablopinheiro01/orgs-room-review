@@ -14,7 +14,7 @@ import br.com.alura.orgs.model.Produto
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
-    private var produtoId: Long? = null
+    private var produtoId: Long = 0L
     private var produto: Produto? = null
     private val binding by lazy {
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
@@ -32,15 +32,17 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 
         override fun onResume() {
             super.onResume()
-            produtoId?.let { id ->
-                produto = produtoDao.buscaPorId(id)
-            }
-            produto?.let { produtoCarregado ->
-                preencheCampos(produtoCarregado)
-            } ?: finish()
+            buscaProduto()
         }
 
-        override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    private fun buscaProduto() {
+        produto = produtoDao.buscaPorId(produtoId)
+        produto?.let { produtoCarregado ->
+            preencheCampos(produtoCarregado)
+        } ?: finish()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
             menuInflater.inflate(R.menu.menu_detalhes_produto, menu)
 
             return super.onCreateOptionsMenu(menu)
@@ -55,7 +57,7 @@ class DetalhesProdutoActivity : AppCompatActivity() {
                 }
                 R.id.menu_detalhes_produto_editar ->{
                     Intent(this, FormularioProdutoActivity::class.java).apply{
-                        putExtra(CHAVE_PRODUTO, produto)
+                        putExtra(ID_PRODUTO, produtoId)
                         startActivity(this)
                     }
                 }
@@ -65,10 +67,13 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
         private fun tentaCarregarProduto() {
-            intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
-//                produto = produtoCarregado
-                produtoId = produtoCarregado.id
-            } ?: finish()
+//            intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
+////                produto = produtoCarregado
+//                produtoId = produtoCarregado.id
+//            } ?: finish()
+
+            produtoId = intent.getLongExtra(ID_PRODUTO, 0L)
+
         }
 
         private fun preencheCampos(produtoCarregado: Produto) {
