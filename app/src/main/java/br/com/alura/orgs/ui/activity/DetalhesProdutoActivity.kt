@@ -1,5 +1,6 @@
 package br.com.alura.orgs.ui.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -13,57 +14,71 @@ import br.com.alura.orgs.model.Produto
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
-    private lateinit var produto: Produto
+    private var produtoId: Long? = null
+    private var produto: Produto? = null
     private val binding by lazy {
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        tentaCarregarProduto()
+    private val produtoDao by lazy {
+        AppDatabase.getInstance(this).produtoDao()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_detalhes_produto, menu)
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(binding.root)
+            tentaCarregarProduto()
+        }
 
-        return super.onCreateOptionsMenu(menu)
-    }
+        override fun onResume() {
+            super.onResume()
+            produtoId?.let { id ->
+                produto = produtoDao.buscaPorId(id)
+            }
+            produto?.let { produtoCarregado ->
+                preencheCampos(produtoCarregado)
+            } ?: finish()
+        }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(::produto.isInitialized){
-            val db = AppDatabase.getInstance(this)
-            val produtoDao = db.produtoDao()
+        override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+            menuInflater.inflate(R.menu.menu_detalhes_produto, menu)
 
+            return super.onCreateOptionsMenu(menu)
+        }
+
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//            if(::produto.isInitialized)
             when(item.itemId){
                 R.id.menu_detalhes_produto_remover -> {
-                    produtoDao.delete(produto)
+                    produto?.let { produtoDao.delete(it) }
                     finish()
                 }
                 R.id.menu_detalhes_produto_editar ->{
-
+                    Intent(this, FormularioProdutoActivity::class.java).apply{
+                        putExtra(CHAVE_PRODUTO, produto)
+                        startActivity(this)
+                    }
                 }
-        }
+            }
+
+            return super.onOptionsItemSelected(item)
         }
 
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun tentaCarregarProduto() {
-        intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
-            produto = produtoCarregado
-            preencheCampos(produtoCarregado)
-        } ?: finish()
-    }
-
-    private fun preencheCampos(produtoCarregado: Produto) {
-        with(binding) {
-            activityDetalhesProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
-            activityDetalhesProdutoNome.text = produtoCarregado.nome
-            activityDetalhesProdutoDescricao.text = produtoCarregado.descricao
-            activityDetalhesProdutoValor.text =
-                produtoCarregado.valor.formataParaMoedaBrasileira()
+        private fun tentaCarregarProduto() {
+            intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
+//                produto = produtoCarregado
+                produtoId = produtoCarregado.id
+            } ?: finish()
         }
-    }
+
+        private fun preencheCampos(produtoCarregado: Produto) {
+            with(binding) {
+                activityDetalhesProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
+                activityDetalhesProdutoNome.text = produtoCarregado.nome
+                activityDetalhesProdutoDescricao.text = produtoCarregado.descricao
+                activityDetalhesProdutoValor.text =
+                    produtoCarregado.valor.formataParaMoedaBrasileira()
+            }
+        }
 
 }
