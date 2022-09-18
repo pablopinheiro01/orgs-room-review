@@ -13,14 +13,22 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun produtoDao(): ProdutoDao
 
     companion object{
-        fun getInstance(context: Context)=
-            Room.databaseBuilder(
-                context,
-                AppDatabase::class.java,
-                "orgs.db"
-            )
-                .allowMainThreadQueries()
-                .build()
+
+        @Volatile //avisa todas as threads quando um valor é inserido no property
+        private lateinit var db: AppDatabase
+
+        fun getInstance(context: Context): AppDatabase {
+            if(::db.isInitialized) return db
+            return Room.databaseBuilder(
+                    context,
+                    AppDatabase::class.java,
+                    "orgs.db"
+                ).allowMainThreadQueries()
+                    .build().also {
+                        db = it
+                }
+        }
     }
+
 
 }
