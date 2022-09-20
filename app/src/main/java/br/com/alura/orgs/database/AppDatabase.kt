@@ -23,10 +23,7 @@ abstract class AppDatabase: RoomDatabase() {
                     context,
                     AppDatabase::class.java,
                     "orgs.db"
-                ).allowMainThreadQueries()
-                    .build().also {
-                        db = it
-                }
+                ).build()
         }
     }
 
