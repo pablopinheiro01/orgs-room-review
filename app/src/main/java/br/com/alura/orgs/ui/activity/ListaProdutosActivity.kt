@@ -10,6 +10,11 @@ import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
+private const val TAG = "ListaProdutosActivity"
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -23,6 +28,19 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        runBlocking {
+            Log.i(TAG,"onCreate: runblocking init")
+            repeat(100){
+                launch {
+                    Log.i(TAG, "onCreate: launch start $it")
+//                    Thread.sleep(10000L) //bloqueia a thread
+                    //vai executar somente no final de tudo
+                    delay(10000L) //não bloqueia a main thread e permite a execução do restante do codigo
+                    Log.i(TAG, "onCreate: launch finish $it")
+                }
+            }
+            Log.i(TAG, "onCreate: runBlocking Finish")
+        }
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
