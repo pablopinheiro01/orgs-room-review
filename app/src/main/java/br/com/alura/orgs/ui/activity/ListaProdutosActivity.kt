@@ -3,7 +3,10 @@ package br.com.alura.orgs.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
@@ -13,6 +16,9 @@ class ListaProdutosActivity : AppCompatActivity() {
     private val adapter = ListaProdutosAdapter(context = this)
     private val binding by lazy {
         ActivityListaProdutosActivityBinding.inflate(layoutInflater)
+    }
+    private val produtoDao by lazy {
+        AppDatabase.getInstance(this).produtoDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,10 +31,45 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val db = AppDatabase.getInstance(this)
-        val produtoDao = db.produtoDao()
         adapter.atualiza(produtoDao.buscaTodos())
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_lista_produtos, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when(item.itemId){
+            R.id.nome_asc -> {
+                adapter.atualiza(produtoDao.buscaNomeAsc())
+            }
+            R.id.nome_desc -> {
+
+                adapter.atualiza(produtoDao.buscaNomeDesc())
+            }
+            R.id.descricao_asc -> {
+                adapter.atualiza(produtoDao.buscaDescricaoAsc())
+            }
+            R.id.descricao_desc -> {
+                adapter.atualiza(produtoDao.buscaDescricaoDesc())
+            }
+            R.id.valor_asc -> {
+                adapter.atualiza(produtoDao.buscaValorAsc())
+            }
+            R.id.valor_desc -> {
+                adapter.atualiza(produtoDao.buscaValorDesc())
+            }
+            R.id.sem_ordenacao -> {
+                adapter.atualiza(produtoDao.buscaTodos())
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+
 
     private fun configuraFab() {
         val fab = binding.activityListaProdutosFab
@@ -54,11 +95,15 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        adapter.quandoClicaEmEditar = {
-            Log.i("teste", "Editar: $it")
+        adapter.quandoClicaEmEditar = { produto ->
+            Intent(this, FormularioProdutoActivity::class.java).apply{
+                putExtra(ID_PRODUTO, produto.id)
+                startActivity(this)
+            }
         }
-        adapter.quandoClicaemRemover = {
-            Log.i("teste", "Remover: $it")
+        adapter.quandoClicaemRemover = { produto ->
+             produtoDao.delete(produto)
+            adapter.atualiza(produtoDao.buscaTodos())
         }
 
     }

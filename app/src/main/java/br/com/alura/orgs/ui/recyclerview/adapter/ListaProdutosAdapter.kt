@@ -38,6 +38,7 @@ class ListaProdutosAdapter(
                 when(it.itemId){
                     R.id.menu_detalhes_produto_remover -> {
                         quandoClicaemRemover(produto)
+                        notifyDataSetChanged()
                         true
                     }
                     R.id.menu_detalhes_produto_editar ->{
@@ -98,6 +99,8 @@ class ListaProdutosAdapter(
     fun atualiza(produtos: List<Produto>) {
         this.produtos.clear()
         this.produtos.addAll(produtos)
+        Log.i("ordem this", "${this.produtos}")
+        Log.i("ordem", "${produtos}")
         notifyDataSetChanged()
     }
 

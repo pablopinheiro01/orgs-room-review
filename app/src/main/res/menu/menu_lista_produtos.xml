@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/principal_menu"
+        android:icon="@drawable/ic_baseline_reorder_24"
+        android:title="Lista de itens"
+        app:showAsAction="ifRoom">
+        <menu>
+
+            <item
+                android:id="@+id/nome_desc"
+                android:title="nome desc" />
+            <item
+                android:id="@+id/nome_asc"
+                android:title="nome asc" />
+            <item
+                android:id="@+id/descricao_desc"
+                android:title="descrição desc" />
+            <item
+                android:id="@+id/descricao_asc"
+                android:title="descricao asc" />
+            <item
+                android:id="@+id/valor_desc"
+                android:title="valor desc" />
+            <item
+                android:id="@+id/valor_asc"
+                android:title="valor asc" />
+            <item
+                android:id="@+id/sem_ordenacao"
+                android:title="sem ordenacao" />
+        </menu>
+
+    </item>
+</menu>
