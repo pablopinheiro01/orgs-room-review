@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
@@ -42,13 +43,16 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
     private fun buscaProduto() {
-        repeat(100){ //executando varias vezes pegamos uma thread que nao foi criada a tela
+//        repeat(100){ //executando varias vezes pegamos uma thread que nao foi criada a tela
             scope.launch {
                 produto = produtoDao.buscaPorId(produtoId)
-                produto?.let { produtoCarregado ->
-                    preencheCampos(produtoCarregado)
-                } ?: finish()
-            }
+                //Qualquer execução que envolva a tela precisa ser executada na MAIN thread
+                withContext(Dispatchers.Main){ //vou executar em uma thread diferente da IO, executando na principal MAIN
+                    produto?.let { produtoCarregado ->
+                        preencheCampos(produtoCarregado)
+                    } ?: finish()
+                }
+//            }
         }
     }
 
