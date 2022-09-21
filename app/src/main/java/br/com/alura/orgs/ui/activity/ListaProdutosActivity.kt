@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
@@ -35,16 +36,24 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            Log.i(TAG, "Erro do Coroutine $throwable")
+            Toast.makeText(this, "ocorreu um erro", Toast.LENGTH_LONG).show()
+        }
         val scope = MainScope()
 
-        scope.launch {
-            val produtos = withContext(Dispatchers.IO){
-//            Thread.sleep(10000L)
-               produtoDao.buscaTodos()
+        //o builder launch consegue receber por parametro o handler para tratamento de erro
+        scope.launch(handler){
+//            throw Exception("erro qualquer dentro do launch")
+            val produtos = withContext(Dispatchers.IO) {
+                produtoDao.buscaTodos()
+                            throw Exception("erro qualquer dentro de IO")
             }
+                            throw Exception("erro qualquer depois do withcontext ")
             adapter.atualiza(produtos)
-
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
