@@ -11,6 +11,10 @@ import br.com.alura.orgs.databinding.ActivityDetalhesProdutoBinding
 import br.com.alura.orgs.extensions.formataParaMoedaBrasileira
 import br.com.alura.orgs.extensions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
@@ -24,6 +28,8 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         AppDatabase.getInstance(this).produtoDao()
     }
 
+    private val scope = CoroutineScope(IO)
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(binding.root)
@@ -36,15 +42,18 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
     private fun buscaProduto() {
-        produto = produtoDao.buscaPorId(produtoId)
-        produto?.let { produtoCarregado ->
-            preencheCampos(produtoCarregado)
-        } ?: finish()
+        repeat(100){ //executando varias vezes pegamos uma thread que nao foi criada a tela
+            scope.launch {
+                produto = produtoDao.buscaPorId(produtoId)
+                produto?.let { produtoCarregado ->
+                    preencheCampos(produtoCarregado)
+                } ?: finish()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
             menuInflater.inflate(R.menu.menu_detalhes_produto, menu)
-
             return super.onCreateOptionsMenu(menu)
         }
 
@@ -52,7 +61,9 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 //            if(::produto.isInitialized)
             when(item.itemId){
                 R.id.menu_detalhes_produto_remover -> {
-                    produto?.let { produtoDao.delete(it) }
+                    produto?.let {
+                        produtoDao.delete(it)
+                    }
                     finish()
                 }
                 R.id.menu_detalhes_produto_editar ->{
