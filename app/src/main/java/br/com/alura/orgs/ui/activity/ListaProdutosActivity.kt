@@ -39,7 +39,7 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         scope.launch {
             val produtos = withContext(Dispatchers.IO){
-            Thread.sleep(10000L)
+//            Thread.sleep(10000L)
                produtoDao.buscaTodos()
             }
             adapter.atualiza(produtos)

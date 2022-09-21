@@ -66,7 +66,9 @@ class DetalhesProdutoActivity : AppCompatActivity() {
             when(item.itemId){
                 R.id.menu_detalhes_produto_remover -> {
                     produto?.let {
-                        produtoDao.delete(it)
+                        scope.launch {
+                            produtoDao.delete(it)
+                        }
                     }
                     finish()
                 }
