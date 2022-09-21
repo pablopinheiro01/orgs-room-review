@@ -10,10 +10,8 @@ import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 private const val TAG = "ListaProdutosActivity"
 
@@ -40,8 +38,12 @@ class ListaProdutosActivity : AppCompatActivity() {
         val scope = MainScope()
 
         scope.launch {
-            delay(10000L)
-            adapter.atualiza(produtoDao.buscaTodos())
+            val produtos = withContext(Dispatchers.IO){
+            Thread.sleep(10000L)
+               produtoDao.buscaTodos()
+            }
+            adapter.atualiza(produtos)
+
         }
     }
 
