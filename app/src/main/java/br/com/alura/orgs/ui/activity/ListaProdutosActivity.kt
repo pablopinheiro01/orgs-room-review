@@ -26,6 +26,8 @@ class ListaProdutosActivity : AppCompatActivity() {
         AppDatabase.getInstance(this).produtoDao()
     }
 
+    private val job = Job()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -41,38 +43,31 @@ class ListaProdutosActivity : AppCompatActivity() {
             Log.i(TAG, "Erro do Coroutine $throwable")
             Toast.makeText(this, "ocorreu um erro", Toast.LENGTH_LONG).show()
         }
-
         val scope = MainScope()
-        val job = Job() //job pode ser compartilhado entre coroutines
 
-        // codigo de teste executando um cancelamento com JOB
-        val jobPrimario = scope.launch(job + handler + Dispatchers.IO + CoroutineName("Primaria")) {
+        scope.launch(job + handler + Dispatchers.IO + CoroutineName("Primaria")) {
             Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
-            //caso saia da tela, minimize o app, a coroutine continuara executando
             repeat(1000){
                 Log.i("onResume", "onResume: Coroutine está em execução $it")
                 delay(1000L)
-//                job.cancel()
             }
         }
 
-        // --------------------------------------------------------------------------
-        //codigo de teste lançando exception
-        //o builder launch consegue receber por parametro o handler para tratamento de erro
         scope.launch(job + handler){
-            //cancelando a coroutine anterior depois de 1 segundo da execução dessa coroutine
-            delay(1000L)
-//            job.cancel() //cancelando todas as coroutines q fazem referencia ao job
-//            jobPrimario.cancel() //cancela o retorno do builder da coroutine anterior (acima)
 //            throw Exception("erro qualquer dentro do launch")
             val produtos = withContext(Dispatchers.IO) {
                 produtoDao.buscaTodos()
-                            throw Exception("erro qualquer dentro de IO")
+//                            throw Exception("erro qualquer dentro de IO")
             }
-                            throw Exception("erro qualquer depois do withcontext ")
+//                            throw Exception("erro qualquer depois do withcontext ")
             adapter.atualiza(produtos)
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
