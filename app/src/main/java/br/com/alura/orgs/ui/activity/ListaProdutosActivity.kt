@@ -7,9 +7,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
+import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -36,8 +38,24 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
+    override fun onResume(){
         super.onResume()
+        lifecycleScope.launch( CoroutineName("Primaria")) {
+            Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
+            repeat(1000){
+                Log.i("onResume", "onResume: Coroutine está em execução $it")
+                delay(1000L)
+            }
+        }
+        //por padrão a lifecycleScope é mainsafe e possui autocancelamento
+        lifecycleScope.launch{
+            val produtos = produtoDao.buscaTodos()
+            adapter.atualiza(produtos)
+        }
+
+    }
+
+    fun testesDeCoroutineUtilizadoApenasComoExemplo() {
 
         val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
             Log.i(TAG, "Erro do Coroutine $throwable")
@@ -77,28 +95,31 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        when(item.itemId){
-            R.id.nome_asc -> {
-                adapter.atualiza(produtoDao.buscaNomeAsc())
-            }
-            R.id.nome_desc -> {
+        lifecycleScope.launch{
 
-                adapter.atualiza(produtoDao.buscaNomeDesc())
-            }
-            R.id.descricao_asc -> {
-                adapter.atualiza(produtoDao.buscaDescricaoAsc())
-            }
-            R.id.descricao_desc -> {
-                adapter.atualiza(produtoDao.buscaDescricaoDesc())
-            }
-            R.id.valor_asc -> {
-                adapter.atualiza(produtoDao.buscaValorAsc())
-            }
-            R.id.valor_desc -> {
-                adapter.atualiza(produtoDao.buscaValorDesc())
-            }
-            R.id.sem_ordenacao -> {
-                adapter.atualiza(produtoDao.buscaTodos())
+            when(item.itemId){
+                R.id.nome_asc -> {
+                    adapter.atualiza(produtoDao.buscaNomeAsc())
+                }
+                R.id.nome_desc -> {
+
+                    adapter.atualiza(produtoDao.buscaNomeDesc())
+                }
+                R.id.descricao_asc -> {
+                    adapter.atualiza(produtoDao.buscaDescricaoAsc())
+                }
+                R.id.descricao_desc -> {
+                    adapter.atualiza(produtoDao.buscaDescricaoDesc())
+                }
+                R.id.valor_asc -> {
+                    adapter.atualiza(produtoDao.buscaValorAsc())
+                }
+                R.id.valor_desc -> {
+                    adapter.atualiza(produtoDao.buscaValorDesc())
+                }
+                R.id.sem_ordenacao -> {
+                    adapter.atualiza(produtoDao.buscaTodos())
+                }
             }
         }
 
@@ -138,10 +159,17 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
         }
         adapter.quandoClicaemRemover = { produto ->
-             produtoDao.delete(produto)
-            adapter.atualiza(produtoDao.buscaTodos())
+
+            lifecycleScope.launch {
+                produtoDao.delete(produto)
+                adapter.atualiza(produtoDao.buscaTodos())
+            }
         }
 
     }
+
+    //transformando o retorno da busca em uma coroutine suspensa
+    private suspend fun buscaTodosProdutos(): List<Produto> = withContext(Dispatchers.IO) { produtoDao.buscaTodos() }
+
 
 }

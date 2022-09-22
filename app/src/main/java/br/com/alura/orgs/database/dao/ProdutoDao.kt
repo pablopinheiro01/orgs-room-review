@@ -10,22 +10,22 @@ interface ProdutoDao {
     suspend fun buscaTodos(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor ASC ")
-    fun buscaValorAsc(): List<Produto>
+    suspend fun buscaValorAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor DESC ")
-    fun buscaValorDesc(): List<Produto>
+    suspend fun buscaValorDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC ")
-    fun buscaNomeAsc(): List<Produto>
+    suspend fun buscaNomeAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC ")
-    fun buscaNomeDesc(): List<Produto>
+    suspend fun buscaNomeDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao ASC ")
-    fun buscaDescricaoAsc(): List<Produto>
+    suspend fun buscaDescricaoAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao DESC ")
-    fun buscaDescricaoDesc(): List<Produto>
+    suspend fun buscaDescricaoDesc(): List<Produto>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun salva(vararg produto: Produto)
