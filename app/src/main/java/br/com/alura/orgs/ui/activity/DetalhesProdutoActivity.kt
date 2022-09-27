@@ -56,7 +56,6 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//            if(::produto.isInitialized)
             when(item.itemId){
                 R.id.menu_detalhes_produto_remover -> {
                     produto?.let {

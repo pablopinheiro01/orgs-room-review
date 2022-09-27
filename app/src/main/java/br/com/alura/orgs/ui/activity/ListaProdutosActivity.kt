@@ -40,45 +40,8 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume(){
         super.onResume()
-//        lifecycleScope.launch( CoroutineName("Primaria")) {
-//            Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
-//            repeat(1000){
-//                Log.i("onResume", "onResume: Coroutine está em execução $it")
-//                delay(1000L)
-//            }
-//        }
-        //por padrão a lifecycleScope é mainsafe e possui autocancelamento
-        //tambem e possivel executar diretamente sem alterar o Dispatchers para IO
         lifecycleScope.launch{
             val produtos = produtoDao.buscaTodos()
-            adapter.atualiza(produtos)
-        }
-
-    }
-
-    fun testesDeCoroutineUtilizadoApenasComoExemplo() {
-
-        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
-            Log.i(TAG, "Erro do Coroutine $throwable")
-            Toast.makeText(this, "ocorreu um erro", Toast.LENGTH_LONG).show()
-        }
-        val scope = MainScope()
-
-        scope.launch(job + handler + Dispatchers.IO + CoroutineName("Primaria")) {
-            Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
-            repeat(1000){
-                Log.i("onResume", "onResume: Coroutine está em execução $it")
-                delay(1000L)
-            }
-        }
-
-        scope.launch(job + handler){
-//            throw Exception("erro qualquer dentro do launch")
-            val produtos = withContext(Dispatchers.IO) {
-                produtoDao.buscaTodos()
-//                            throw Exception("erro qualquer dentro de IO")
-            }
-//                            throw Exception("erro qualquer depois do withcontext ")
             adapter.atualiza(produtos)
         }
 
@@ -166,11 +129,6 @@ class ListaProdutosActivity : AppCompatActivity() {
                 adapter.atualiza(produtoDao.buscaTodos())
             }
         }
-
     }
-
-    //transformando o retorno da busca em uma coroutine suspensa
-    private suspend fun buscaTodosProdutos(): List<Produto> = withContext(Dispatchers.IO) { produtoDao.buscaTodos() }
-
 
 }
