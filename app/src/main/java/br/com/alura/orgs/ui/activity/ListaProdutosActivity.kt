@@ -40,14 +40,15 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume(){
         super.onResume()
-        lifecycleScope.launch( CoroutineName("Primaria")) {
-            Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
-            repeat(1000){
-                Log.i("onResume", "onResume: Coroutine está em execução $it")
-                delay(1000L)
-            }
-        }
+//        lifecycleScope.launch( CoroutineName("Primaria")) {
+//            Log.i(TAG, "onResume: Contexto da coroutine ${coroutineContext}")
+//            repeat(1000){
+//                Log.i("onResume", "onResume: Coroutine está em execução $it")
+//                delay(1000L)
+//            }
+//        }
         //por padrão a lifecycleScope é mainsafe e possui autocancelamento
+        //tambem e possivel executar diretamente sem alterar o Dispatchers para IO
         lifecycleScope.launch{
             val produtos = produtoDao.buscaTodos()
             adapter.atualiza(produtos)

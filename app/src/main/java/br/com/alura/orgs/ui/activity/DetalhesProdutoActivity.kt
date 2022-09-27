@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityDetalhesProdutoBinding
@@ -29,8 +30,6 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         AppDatabase.getInstance(this).produtoDao()
     }
 
-    private val scope = CoroutineScope(IO)
-
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(binding.root)
@@ -43,16 +42,11 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
     private fun buscaProduto() {
-//        repeat(100){ //executando varias vezes pegamos uma thread que nao foi criada a tela
-            scope.launch {
-                produto = produtoDao.buscaPorId(produtoId)
-                //Qualquer execução que envolva a tela precisa ser executada na MAIN thread
-                withContext(Dispatchers.Main){ //vou executar em uma thread diferente da IO, executando na principal MAIN
-                    produto?.let { produtoCarregado ->
-                        preencheCampos(produtoCarregado)
-                    } ?: finish()
-                }
-//            }
+        lifecycleScope.launch {
+            produto = produtoDao.buscaPorId(produtoId)
+                produto?.let { produtoCarregado ->
+                    preencheCampos(produtoCarregado)
+                } ?: finish()
         }
     }
 
@@ -66,7 +60,7 @@ class DetalhesProdutoActivity : AppCompatActivity() {
             when(item.itemId){
                 R.id.menu_detalhes_produto_remover -> {
                     produto?.let {
-                        scope.launch {
+                        lifecycleScope.launch {
                             produtoDao.delete(it)
                         }
                     }
@@ -84,11 +78,6 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         }
 
         private fun tentaCarregarProduto() {
-//            intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
-////                produto = produtoCarregado
-//                produtoId = produtoCarregado.id
-//            } ?: finish()
-
             produtoId = intent.getLongExtra(ID_PRODUTO, 0L)
 
         }

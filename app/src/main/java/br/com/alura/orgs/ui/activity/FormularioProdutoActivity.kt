@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.database.dao.ProdutoDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
@@ -28,8 +29,6 @@ class FormularioProdutoActivity : AppCompatActivity() {
         db.produtoDao()
     }
 
-    private val scope = CoroutineScope(Dispatchers.IO)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -42,10 +41,6 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     binding.activityFormularioProdutoImagem.tentaCarregarImagem(url)
                 }
         }
-//        intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
-//            produtoId = produtoCarregado.id
-//            preencheCampos(produtoCarregado)
-//        }
         tentaCarregarProduto()
     }
 
@@ -55,11 +50,9 @@ class FormularioProdutoActivity : AppCompatActivity() {
     }
 
     private fun tentaBuscarProduto() {
-        scope.launch{
+        lifecycleScope.launch{
             produtoDao.buscaPorId(produtoId)?.let {
-                withContext(Dispatchers.Main){
-                    preencheCampos(it)
-                }
+                preencheCampos(it)
             }
         }
     }
@@ -79,21 +72,12 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
-//        val dao = ProdutosDao()
-        //configurando o builder!
-
 
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-//            if(produtoId > 0 ){
-//                produtoDao.atualiza(produtoNovo.copy(id=produtoId))
-//            }else{
-//                produtoDao.salva(produtoNovo)
-//            }
-            scope.launch {
+            lifecycleScope.launch {
                 produtoDao.salva(produtoNovo)
             }
-//            dao.adiciona(produtoNovo)
             finish()
         }
     }
