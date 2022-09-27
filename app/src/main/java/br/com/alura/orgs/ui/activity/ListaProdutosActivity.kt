@@ -14,6 +14,8 @@ import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlin.coroutines.CoroutineContext
 
 private const val TAG = "ListaProdutosActivity"
@@ -36,14 +38,25 @@ class ListaProdutosActivity : AppCompatActivity() {
         configuraRecyclerView()
         configuraFab()
 
-    }
-
-    override fun onResume(){
-        super.onResume()
         lifecycleScope.launch{
-            val produtos = produtoDao.buscaTodos()
-            adapter.atualiza(produtos)
+            produtoDao.buscaTodos().collect{ listaProdutos ->
+                adapter.atualiza(listaProdutos)
+            }
         }
+
+        //exemplo simples de uso do Flow
+//        val numberFlow = flow<Int> {
+//            repeat(100) {
+//                emit(it)
+//                delay(1000)
+//            }
+//        }
+//
+//        lifecycleScope.launch{
+//            numberFlow.collect{ number ->
+//                Log.i(TAG, "numero recebido: $number ")
+//            }
+//        }
 
     }
 
@@ -82,7 +95,10 @@ class ListaProdutosActivity : AppCompatActivity() {
                     adapter.atualiza(produtoDao.buscaValorDesc())
                 }
                 R.id.sem_ordenacao -> {
-                    adapter.atualiza(produtoDao.buscaTodos())
+//                    adapter.atualiza(produtoDao.buscaTodos())
+                    produtoDao.buscaTodos().collect{
+                        adapter.atualiza(it)
+                    }
                 }
             }
         }
@@ -123,10 +139,10 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
         }
         adapter.quandoClicaemRemover = { produto ->
-
             lifecycleScope.launch {
                 produtoDao.delete(produto)
-                adapter.atualiza(produtoDao.buscaTodos())
+                //nao e necessario atualizar a busca devido o uso do Flow estar observando as atualizacoes no banco
+//                adapter.atualiza(produtoDao.buscaTodos())
             }
         }
     }
