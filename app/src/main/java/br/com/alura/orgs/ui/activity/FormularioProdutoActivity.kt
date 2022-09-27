@@ -51,8 +51,9 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
     private fun tentaBuscarProduto() {
         lifecycleScope.launch{
-            produtoDao.buscaPorId(produtoId)?.let {
-                preencheCampos(it)
+
+            produtoDao.buscaPorId(produtoId).collect{ produto ->
+                produto?.let{preencheCampos(produto)}
             }
         }
     }

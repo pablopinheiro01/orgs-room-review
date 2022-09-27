@@ -11,22 +11,22 @@ interface ProdutoDao {
     fun buscaTodos(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY valor ASC ")
-    suspend fun buscaValorAsc(): List<Produto>
+    fun buscaValorAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY valor DESC ")
-    suspend fun buscaValorDesc(): List<Produto>
+    fun buscaValorDesc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC ")
-    suspend fun buscaNomeAsc(): List<Produto>
+    fun buscaNomeAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC ")
-    suspend fun buscaNomeDesc(): List<Produto>
+    fun buscaNomeDesc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY descricao ASC ")
-    suspend fun buscaDescricaoAsc(): List<Produto>
+    fun buscaDescricaoAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY descricao DESC ")
-    suspend fun buscaDescricaoDesc(): List<Produto>
+    fun buscaDescricaoDesc(): Flow<List<Produto>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun salva(vararg produto: Produto)
@@ -39,6 +39,6 @@ interface ProdutoDao {
 //    fun atualiza(produto: Produto)
 
     @Query("SELECT * FROM Produto WHERE id = :id ")
-    suspend fun buscaPorId(id: Long) : Produto?
+    fun buscaPorId(id: Long) : Flow<Produto?>
 
 }

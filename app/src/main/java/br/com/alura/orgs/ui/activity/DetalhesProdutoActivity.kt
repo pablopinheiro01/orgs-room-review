@@ -15,6 +15,7 @@ import br.com.alura.orgs.model.Produto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -43,10 +44,11 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 
     private fun buscaProduto() {
         lifecycleScope.launch {
-            produto = produtoDao.buscaPorId(produtoId)
-                produto?.let { produtoCarregado ->
-                    preencheCampos(produtoCarregado)
-                } ?: finish()
+             produtoDao.buscaPorId(produtoId).collect { produto ->
+                 produto?.let { produtoCarregado ->
+                     preencheCampos(produtoCarregado)
+                 } ?: finish()
+             }
         }
     }
 

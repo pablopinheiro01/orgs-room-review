@@ -43,21 +43,6 @@ class ListaProdutosActivity : AppCompatActivity() {
                 adapter.atualiza(listaProdutos)
             }
         }
-
-        //exemplo simples de uso do Flow
-//        val numberFlow = flow<Int> {
-//            repeat(100) {
-//                emit(it)
-//                delay(1000)
-//            }
-//        }
-//
-//        lifecycleScope.launch{
-//            numberFlow.collect{ number ->
-//                Log.i(TAG, "numero recebido: $number ")
-//            }
-//        }
-
     }
 
     override fun onDestroy() {
@@ -76,26 +61,36 @@ class ListaProdutosActivity : AppCompatActivity() {
 
             when(item.itemId){
                 R.id.nome_asc -> {
-                    adapter.atualiza(produtoDao.buscaNomeAsc())
+                    produtoDao.buscaNomeAsc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.nome_desc -> {
-
-                    adapter.atualiza(produtoDao.buscaNomeDesc())
+                    produtoDao.buscaNomeDesc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.descricao_asc -> {
-                    adapter.atualiza(produtoDao.buscaDescricaoAsc())
+                    produtoDao.buscaDescricaoAsc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.descricao_desc -> {
-                    adapter.atualiza(produtoDao.buscaDescricaoDesc())
+                    produtoDao.buscaDescricaoDesc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.valor_asc -> {
-                    adapter.atualiza(produtoDao.buscaValorAsc())
+                    produtoDao.buscaValorAsc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.valor_desc -> {
-                    adapter.atualiza(produtoDao.buscaValorDesc())
+                    produtoDao.buscaValorDesc().collect{
+                        adapter.atualiza(it)
+                    }
                 }
                 R.id.sem_ordenacao -> {
-//                    adapter.atualiza(produtoDao.buscaTodos())
                     produtoDao.buscaTodos().collect{
                         adapter.atualiza(it)
                     }
